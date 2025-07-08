@@ -1,0 +1,14 @@
+/* src/components/Header.css */
+.app-header {
+  background-color: #007bff; /* Синій фон */
+  color: white;
+  padding: 20px 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: 2.5em;
+  text-align: center;
+}

@@ -1,0 +1,122 @@
+/* src/components/HomePage.css */
+.home-page {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  text-align: center;
+  background-color: #f0f2f5;
+  min-height: 100vh;
+}
+
+/* Секція додавання нотатки */
+.add-note-section {
+  background-color: #ffffff;
+  margin: 20px auto;
+  padding: 25px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  max-width: 700px;
+  text-align: left;
+}
+
+.add-note-section h2 {
+  color: #333;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 15px;
+  margin-bottom: 20px;
+  font-size: 1.8em;
+}
+
+.add-note-section input,
+.add-note-section textarea {
+  width: calc(100% - 24px); 
+  padding: 12px;
+  margin-bottom: 15px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 1em;
+  box-sizing: border-box;
+}
+
+.add-note-section textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.add-note-section button {
+  padding: 12px 25px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1.1em;
+  transition: background-color 0.3s ease;
+}
+
+.add-note-section button:hover {
+  background-color: #218838;
+}
+
+/* Секція списку нотаток */
+.notes-list-section {
+  background-color: #ffffff;
+  margin: 20px auto;
+  padding: 25px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  max-width: 700px;
+  text-align: left;
+}
+
+.notes-list-section h2 {
+  color: #333;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 15px;
+  margin-bottom: 20px;
+  font-size: 1.8em;
+}
+
+.notes-list-section p {
+  color: #666;
+  font-style: italic;
+  text-align: center;
+}
+
+/* Сітка для карток нотаток */
+.notes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* Адаптивна сітка */
+  gap: 20px; 
+  padding: 0;
+  list-style: none; 
+}
+
+.note-card {
+  background-color: #fafafa;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; 
+}
+
+.note-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+}
+
+.note-card h3 {
+  margin-top: 0;
+  color: #444;
+  font-size: 1.3em;
+  margin-bottom: 10px;
+}
+
+.note-card p {
+  color: #666;
+  font-size: 0.95em;
+  line-height: 1.6;
+  flex-grow: 1; 
+}
