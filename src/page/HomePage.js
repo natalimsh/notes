@@ -3,7 +3,17 @@ import React, { useState, useEffect, useCallback } from 'react';
 import Header from '../components/Header';
 import './HomePage.css';
 
-const API_URL = 'http://localhost:3001/notes';
+// Зверніть увагу: цей URL призначений ТІЛЬКИ для читання даних.
+// Операції POST/PUT/DELETE не будуть працювати з raw.githubusercontent.com
+const API_URL_READ_ONLY = 'https://raw.githubusercontent.com/natalimsh/notes/main/data/db.json';
+// Для локального розроблення з json-server використовуйте:
+const API_URL_LOCAL_CRUD = 'http://localhost:3001/notes';
+
+// Вибираємо, який API_URL використовувати.
+// Можна додати логіку для визначення середовища (development/production)
+// Але для простоти зараз просто перемкнемо.
+const IS_PRODUCTION_DEPLOYMENT = true; // Змініть на false, якщо тестуєте локально з json-server
+const API_URL = IS_PRODUCTION_DEPLOYMENT ? API_URL_READ_ONLY : API_URL_LOCAL_CRUD;
 
 function HomePage() {
   const [notes, setNotes] = useState([]);
@@ -15,16 +25,28 @@ function HomePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Прапор для визначення, чи доступні операції запису
+  const isCrudEnabled = !IS_PRODUCTION_DEPLOYMENT; // CRUD лише при локальному запуску
+
   const fetchNotes = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
       const response = await fetch(API_URL);
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        // Якщо файл db.json не знайдено або інша помилка читання
+        if (response.status === 404 && IS_PRODUCTION_DEPLOYMENT) {
+          setError("Файл даних не знайдено на GitHub. Переконайтеся, що 'data/db.json' існує та доступний.");
+        } else {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
       }
       const data = await response.json();
-      setNotes(data);
+      // Переконаємося, що data це масив. Для raw GitHub це буде об'єкт з ключем 'notes'
+      // Або просто масив, якщо ви завантажили тільки сам масив нотаток.
+      // Давайте припустимо, що raw.githubusercontent.com повертає об'єкт { "notes": [...] }
+      setNotes(data.notes || []); // Якщо API_URL вказує на { "notes": [...] }
+      // Якщо API_URL_READ_ONLY вказує лише на сам масив нотаток, то setNotes(data);
     } catch (err) {
       setError("Не вдалося завантажити нотатки: " + err.message);
       console.error("Помилка завантаження нотаток:", err);
@@ -38,6 +60,10 @@ function HomePage() {
   }, [fetchNotes]);
 
   const addNote = async () => {
+    if (!isCrudEnabled) {
+      alert('Додавання нотаток неможливе на публічному деплої (тільки для читання).');
+      return;
+    }
     if (newNoteTitle.trim() === '' || newNoteText.trim() === '') {
       alert('Будь ласка, введіть заголовок і текст нотатки.');
       return;
@@ -71,6 +97,10 @@ function HomePage() {
   };
 
   const deleteNote = async (id) => {
+    if (!isCrudEnabled) {
+      alert('Видалення нотаток неможливе на публічному деплої (тільки для читання).');
+      return;
+    }
     if (window.confirm('Ви впевнені, що хочете видалити цю нотатку?')) {
       try {
         const response = await fetch(`${API_URL}/${id}`, {
@@ -89,12 +119,20 @@ function HomePage() {
   };
 
   const startEditing = (note) => {
+    if (!isCrudEnabled) {
+      alert('Редагування нотаток неможливе на публічному деплої (тільки для читання).');
+      return;
+    }
     setEditingNoteId(note.id);
     setEditedTitle(note.title);
     setEditedText(note.text);
   };
 
   const saveEditedNote = async () => {
+    if (!isCrudEnabled) {
+      alert('Збереження відредагованих нотаток неможливе на публічному деплої (тільки для читання).');
+      return;
+    }
     if (editedTitle.trim() === '' || editedText.trim() === '') {
       alert('Заголовок і текст нотатки не можуть бути пустими.');
       return;
@@ -168,13 +206,20 @@ function HomePage() {
           placeholder="Заголовок нотатки"
           value={newNoteTitle}
           onChange={(e) => setNewNoteTitle(e.target.value)}
+          disabled={!isCrudEnabled} // Вимкнено для деплою
         />
         <textarea
           placeholder="Текст нотатки"
           value={newNoteText}
           onChange={(e) => setNewNoteText(e.target.value)}
+          disabled={!isCrudEnabled} // Вимкнено для деплою
         ></textarea>
-        <button onClick={addNote}>Додати нотатку</button>
+        <button onClick={addNote} disabled={!isCrudEnabled}>Додати нотатку</button>
+        {!isCrudEnabled && (
+          <p className="warning-message">
+            * Додавання нотаток неможливе на Vercel (дані тільки для читання).
+          </p>
+        )}
       </div>
 
       <div className="notes-list-section">
@@ -191,23 +236,35 @@ function HomePage() {
                       type="text"
                       value={editedTitle}
                       onChange={(e) => setEditedTitle(e.target.value)}
+                      disabled={!isCrudEnabled} // Вимкнено для деплою
                     />
                     <textarea
                       value={editedText}
                       onChange={(e) => setEditedText(e.target.value)}
+                      disabled={!isCrudEnabled} // Вимкнено для деплою
                     ></textarea>
                     <div className="edit-buttons">
-                      <button className="save-button" onClick={saveEditedNote}>Зберегти</button>
+                      <button className="save-button" onClick={saveEditedNote} disabled={!isCrudEnabled}>Зберегти</button>
                       <button className="cancel-button" onClick={cancelEditing}>Скасувати</button>
                     </div>
+                    {!isCrudEnabled && (
+                      <p className="warning-message">
+                        * Редагування неможливе на Vercel (дані тільки для читання).
+                      </p>
+                    )}
                   </div>
                 ) : (
                   <>
                     <h3>{note.title}</h3>
                     <p>{note.text}</p>
                     <div className="note-actions">
-                      <button className="edit-button" onClick={() => startEditing(note)}>Редагувати</button>
-                      <button className="delete-button" onClick={() => deleteNote(note.id)}>Видалити</button>
+                      <button className="edit-button" onClick={() => startEditing(note)} disabled={!isCrudEnabled}>Редагувати</button>
+                      <button className="delete-button" onClick={() => deleteNote(note.id)} disabled={!isCrudEnabled}>Видалити</button>
+                      {!isCrudEnabled && (
+                        <p className="warning-message">
+                          * Зміни неможливі на Vercel (дані тільки для читання).
+                        </p>
+                      )}
                     </div>
                   </>
                 )}

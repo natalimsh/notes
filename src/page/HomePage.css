@@ -120,3 +120,14 @@
   line-height: 1.6;
   flex-grow: 1; 
 }
+
+.warning-message {
+  color: #856404; /* Yellowish color */
+  background-color: #fff3cd; /* Light yellow background */
+  border: 1px solid #ffeeba;
+  padding: 8px;
+  border-radius: 5px;
+  margin-top: 10px;
+  font-size: 0.9em;
+  text-align: center;
+}
